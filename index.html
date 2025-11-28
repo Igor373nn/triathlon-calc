@@ -20,9 +20,37 @@
   </nav>
 
   <div id="run" class="tab active">
-    <h2>Калькулятор для бега</h2>
-    <p>Здесь будет калькулятор темпа и интервалов.</p>
-  </div>
+<h2>Калькулятор для бега</h2>
+<form id="runCalc">
+  <label>Дистанция (км): <input type="number" id="runDistance" step="0.1"></label><br><br>
+  <label>Время (мин): <input type="number" id="runTime" step="0.1"></label><br><br>
+  <label>Темп (мин/км): <input type="number" id="runPace" step="0.01"></label><br><br>
+  <button type="button" onclick="calcRun()">Рассчитать</button>
+</form>
+
+<p id="runResult"></p>
+
+<script>
+function calcRun() {
+  let d = parseFloat(document.getElementById('runDistance').value);
+  let t = parseFloat(document.getElementById('runTime').value);
+  let p = parseFloat(document.getElementById('runPace').value);
+  let result = "";
+
+  if (d && t && !p) {
+    result = "Темп: " + (t/d).toFixed(2) + " мин/км";
+  } else if (d && p && !t) {
+    result = "Время: " + (d*p).toFixed(2) + " мин";
+  } else if (t && p && !d) {
+    result = "Дистанция: " + (t/p).toFixed(2) + " км";
+  } else {
+    result = "Заполни два поля, чтобы вычислить третье!";
+  }
+
+  document.getElementById('runResult').innerText = result;
+}
+</script>
+
 
   <div id="bike" class="tab">
     <h2>Калькулятор для велосипеда</h2>
