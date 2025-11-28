@@ -3,90 +3,209 @@
 <head>
   <meta charset="UTF-8">
   <title>Triathlon Calc</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <style>
-    body { font-family: Arial, sans-serif; margin: 0; padding: 0; }
-    nav { background: #333; padding: 10px; }
-    nav a { color: white; margin: 0 10px; text-decoration: none; }
-    nav a:hover { text-decoration: underline; }
-    .tab { display: none; padding: 20px; }
-    .active { display: block; }
+    :root {
+      --bg: #0f1216;
+      --panel: #171b21;
+      --accent: #3a86ff;
+      --text: #e9edf3;
+      --muted: #9aa4b2;
+      --ok: #22c55e;
+      --warn: #f59e0b;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: Inter, Arial, sans-serif; background: var(--bg); color: var(--text); }
+    nav { background: var(--panel); border-bottom: 1px solid #222; display: flex; gap: 16px; padding: 12px 16px; position: sticky; top: 0; }
+    nav a { color: var(--text); text-decoration: none; padding: 8px 10px; border-radius: 8px; }
+    nav a.active { background: var(--accent); color: white; }
+    main { max-width: 980px; margin: 24px auto; padding: 0 16px; }
+    .tab { display: none; }
+    .tab.active { display: block; }
+    h2 { margin: 0 0 16px; font-size: 22px; }
+    .card { background: var(--panel); border: 1px solid #222; border-radius: 12px; padding: 16px; }
+    fieldset { border: 1px solid #2a2f37; border-radius: 10px; padding: 12px; margin: 0 0 12px; }
+    legend { padding: 0 6px; color: var(--muted); font-size: 12px; }
+    label { display: grid; grid-template-columns: 140px 1fr; align-items: center; gap: 12px; margin: 8px 0; }
+    input[type="number"] {
+      width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #2a2f37;
+      background: #12161b; color: var(--text); outline: none;
+    }
+    input[type="number"]:focus { border-color: var(--accent); }
+    .btn {
+      display: inline-block; padding: 10px 14px; border-radius: 10px; border: 0;
+      background: var(--accent); color: white; font-weight: 600; cursor: pointer;
+    }
+    .btn.secondary { background: #2c3340; color: var(--text); }
+    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .result { margin-top: 12px; padding: 12px; border-radius: 10px; background: #12161b; border: 1px solid #2a2f37; }
+    .muted { color: var(--muted); font-size: 12px; }
+    @media (max-width: 720px) {
+      label { grid-template-columns: 1fr; gap: 6px; }
+      .grid { grid-template-columns: 1fr; }
+    }
   </style>
 </head>
 <body>
   <nav>
-    <a href="#" onclick="showTab('run')">🏃 Бег</a>
-    <a href="#" onclick="showTab('bike')">🚴 Велосипед</a>
-    <a href="#" onclick="showTab('swim')">🏊 Плавание</a>
+    <a href="#" id="tab-run" class="active" onclick="showTab('run')">🏃 Бег</a>
+    <a href="#" id="tab-bike" onclick="showTab('bike')">🚴 Велосипед</a>
+    <a href="#" id="tab-swim" onclick="showTab('swim')">🏊 Плавание</a>
   </nav>
 
-  <div id="run" class="tab active">
-<h2>Калькулятор для бега</h2>
-<form id="runCalc">
-  <fieldset>
-    <legend>Дистанция</legend>
-    <label>Километры: <input type="number" id="runDistance" step="0.1"></label>
-  </fieldset>
+  <main>
+    <!-- Бег -->
+    <section id="run" class="tab active">
+      <div class="card">
+        <h2>Калькулятор для бега — темп ↔ дистанция ↔ время</h2>
 
-  <fieldset>
-    <legend>Время</legend>
-    <label>Часы: <input type="number" id="runTimeH" min="0"></label>
-    <label>Минуты: <input type="number" id="runTimeM" min="0" max="59"></label>
-    <label>Секунды: <input type="number" id="runTimeS" min="0" max="59"></label>
-  </fieldset>
+        <div class="grid">
+          <fieldset>
+            <legend>Дистанция</legend>
+            <label>
+              <span>Километры</span>
+              <input type="number" id="runDistance" step="0.01" min="0" placeholder="напр. 10">
+            </label>
+            <p class="muted">Введи дистанцию в километрах.</p>
+          </fieldset>
 
-  <fieldset>
-    <legend>Темп (на км)</legend>
-    <label>Минуты: <input type="number" id="runPaceM" min="0"></label>
-    <label>Секунды: <input type="number" id="runPaceS" min="0" max="59"></label>
-  </fieldset>
+          <fieldset>
+            <legend>Темп (мин/км)</legend>
+            <label>
+              <span>Минуты на км</span>
+              <input type="number" id="runPaceM" min="0" placeholder="напр. 5">
+            </label>
+            <label>
+              <span>Секунды на км</span>
+              <input type="number" id="runPaceS" min="0" max="59" placeholder="напр. 30">
+            </label>
+            <p class="muted">Формат вывода будет вида 5:30 мин/км.</p>
+          </fieldset>
+        </div>
 
-  <br>
-  <button type="button" onclick="calcRun()">Рассчитать</button>
-</form>
+        <fieldset>
+          <legend>Общее время</legend>
+          <label>
+            <span>Часы</span>
+            <input type="number" id="runTimeH" min="0" placeholder="напр. 0">
+          </label>
+          <label>
+            <span>Минуты</span>
+            <input type="number" id="runTimeM" min="0" max="59" placeholder="напр. 45">
+          </label>
+          <label>
+            <span>Секунды</span>
+            <input type="number" id="runTimeS" min="0" max="59" placeholder="напр. 00">
+          </label>
+          <p class="muted">Заполни любые два блока (дистанция/темп/время), третий посчитается.</p>
+        </fieldset>
 
-<p id="runResult"></p>
+        <div style="display:flex; gap:8px; margin-top:8px;">
+          <button class="btn" type="button" onclick="calcRun()">Рассчитать</button>
+          <button class="btn secondary" type="button" onclick="clearRun()">Сбросить</button>
+        </div>
 
-<script>
-function calcRun() {
-  let d = parseFloat(document.getElementById('runDistance').value);
+        <div id="runResult" class="result"></div>
+      </div>
+    </section>
 
-  let h = parseInt(document.getElementById('runTimeH').value) || 0;
-  let m = parseInt(document.getElementById('runTimeM').value) || 0;
-  let s = parseInt(document.getElementById('runTimeS').value) || 0;
-  let totalTime = h * 60 + m + s / 60;
+    <!-- Велосипед -->
+    <section id="bike" class="tab">
+      <div class="card">
+        <h2>Калькулятор для велосипеда</h2>
+        <p class="muted">Здесь позже добавим скорость ↔ дистанция ↔ время и интервалы.</p>
+      </div>
+    </section>
 
-  let pm = parseInt(document.getElementById('runPaceM').value) || 0;
-  let ps = parseInt(document.getElementById('runPaceS').value) || 0;
-  let pace = pm + ps / 60;
-
-  let result = "";
-
- if (d && totalTime && !pace) {
-  let rawPace = totalTime / d;
-  let paceMin = Math.floor(rawPace);
-  let paceSec = Math.round((rawPace - paceMin) * 60);
-  if (paceSec === 60) { paceMin += 1; paceSec = 0; }
-  result = `Темп: ${paceMin}:${paceSec.toString().padStart(2, '0')} мин/км`;
-}
-
-</script>
-
-
-
-  <div id="bike" class="tab">
-    <h2>Калькулятор для велосипеда</h2>
-    <p>Здесь будет калькулятор скорости и дистанции.</p>
-  </div>
-
-  <div id="swim" class="tab">
-    <h2>Калькулятор для плавания</h2>
-    <p>Здесь будет калькулятор темпа и бассейна.</p>
-  </div>
+    <!-- Плавание -->
+    <section id="swim" class="tab">
+      <div class="card">
+        <h2>Калькулятор для плавания</h2>
+        <p class="muted">Здесь позже добавим темп (мин/100 м), длину бассейна и серии.</p>
+      </div>
+    </section>
+  </main>
 
   <script>
+    // Переключение вкладок
     function showTab(tabId) {
       document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
       document.getElementById(tabId).classList.add('active');
+      document.querySelectorAll('nav a').forEach(a => a.classList.remove('active'));
+      document.getElementById('tab-' + tabId).classList.add('active');
+    }
+
+    // Утилиты форматирования
+    function toMinutes(h, m, s) {
+      h = Number(h) || 0;
+      m = Number(m) || 0;
+      s = Number(s) || 0;
+      return h * 60 + m + s / 60;
+    }
+
+    function formatPace(minutesPerKm) {
+      if (!isFinite(minutesPerKm)) return "";
+      let paceMin = Math.floor(minutesPerKm);
+      let paceSec = Math.round((minutesPerKm - paceMin) * 60);
+      if (paceSec === 60) { paceMin += 1; paceSec = 0; }
+      return `${paceMin}:${paceSec.toString().padStart(2, '0')} мин/км`;
+    }
+
+    function formatHMS(totalMinutes) {
+      if (!isFinite(totalMinutes)) return "";
+      const totalSeconds = Math.round(totalMinutes * 60);
+      const h = Math.floor(totalSeconds / 3600);
+      const m = Math.floor((totalSeconds % 3600) / 60);
+      const s = totalSeconds % 60;
+      return `${h} ч ${m} мин ${s} сек`;
+    }
+
+    // Калькулятор бега
+    function calcRun() {
+      const d = parseFloat(document.getElementById('runDistance').value);
+      const timeMin = toMinutes(
+        document.getElementById('runTimeH').value,
+        document.getElementById('runTimeM').value,
+        document.getElementById('runTimeS').value
+      );
+      const paceMinPerKm = (Number(document.getElementById('runPaceM').value) || 0) +
+                           (Number(document.getElementById('runPaceS').value) || 0) / 60;
+
+      let filled = {
+        distance: isFinite(d) && d > 0,
+        time: isFinite(timeMin) && timeMin > 0,
+        pace: isFinite(paceMinPerKm) && paceMinPerKm > 0
+      };
+
+      let out = "";
+
+      // Случай 1: d + time -> pace
+      if (filled.distance && filled.time && !filled.pace) {
+        const rawPace = timeMin / d;
+        out = `Темп: ${formatPace(rawPace)}`;
+      }
+      // Случай 2: d + pace -> time
+      else if (filled.distance && filled.pace && !filled.time) {
+        const total = d * paceMinPerKm;
+        out = `Время: ${formatHMS(total)}`;
+      }
+      // Случай 3: time + pace -> distance
+      else if (filled.time && filled.pace && !filled.distance) {
+        const dist = timeMin / paceMinPerKm;
+        out = `Дистанция: ${dist.toFixed(2)} км`;
+      }
+      else {
+        out = "Заполни два блока из трёх (дистанция/темп/время), чтобы посчитать третий.";
+      }
+
+      document.getElementById('runResult').textContent = out;
+    }
+
+    function clearRun() {
+      ['runDistance','runPaceM','runPaceS','runTimeH','runTimeM','runTimeS'].forEach(id => {
+        document.getElementById(id).value = '';
+      });
+      document.getElementById('runResult').textContent = '';
     }
   </script>
 </body>
