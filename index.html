@@ -66,14 +66,19 @@
             </label>
           </fieldset>
 
-          <fieldset>
-            <legend>Темп (мин/км)</legend>
-            <label>
-              <span>Формат -:--</span>
-              <input type="text" id="runPaceInput" placeholder="6:30">
-            </label>
-            <p class="muted">Темп на км, например 5:45</p>
-          </fieldset>
+<fieldset>
+  <legend>Темп (мин/км)</legend>
+  <label>
+    <span>Формат -:--</span>
+    <div style="display:flex;align-items:center;gap:4px;">
+      <input type="number" id="runPaceM" min="0" style="width:60px;" placeholder="6">
+      <span>:</span>
+      <input type="number" id="runPaceS" min="0" max="59" style="width:60px;" placeholder="30">
+    </div>
+  </label>
+  <p class="muted">Темп на км, например 5:45</p>
+</fieldset>
+
         </div>
 
         <fieldset>
@@ -125,67 +130,68 @@
       return h * 60 + m + s / 60;
     }
 
-    function formatPace(minutesPerKm) {
-      if (!isFinite(minutesPerKm)) return "";
-      let paceMin = Math.floor(minutesPerKm);
-      let paceSec = Math.round((minutesPerKm - paceMin) * 60);
-      if (paceSec === 60) { paceMin += 1; paceSec = 0; }
-      return `${paceMin}:${paceSec.toString().padStart(2, '0')} мин/км`;
-    }
+function formatPace(minutesPerKm) {
+  if (!isFinite(minutesPerKm)) return "";
+  let paceMin = Math.floor(minutesPerKm);
+  let paceSec = Math.round((minutesPerKm - paceMin) * 60);
+  if (paceSec === 60) { paceMin += 1; paceSec = 0; }
+  return `${paceMin}:${paceSec.toString().padStart(2, '0')} мин/км`;
+}
 
-    function formatHMS(totalMinutes) {
-      if (!isFinite(totalMinutes)) return "";
-      const totalSeconds = Math.round(totalMinutes * 60);
-      const h = Math.floor(totalSeconds / 3600);
-      const m = Math.floor((totalSeconds % 3600) / 60);
-      const s = totalSeconds % 60;
-      return `${h} ч ${m} мин ${s} сек`;
-    }
+function formatHMS(totalMinutes) {
+  if (!isFinite(totalMinutes)) return "";
+  const totalSeconds = Math.round(totalMinutes * 60);
+  const h = Math.floor(totalSeconds / 3600);
+  const m = Math.floor((totalSeconds % 3600) / 60);
+  const s = totalSeconds % 60;
 
-    // Калькулятор бега
-    function calcRun() {
-      const d = parseFloat(document.getElementById('runDistance').value);
-      const timeMin = toMinutes(
-        document.getElementById('runTimeH').value,
-        document.getElementById('runTimeM').value,
-        document.getElementById('runTimeS').value
-      );
+  let parts = [];
+  if (h > 0) parts.push(`${h} ч`);
+  if (m > 0) parts.push(`${m} мин`);
+  parts.push(`${s} сек`);
 
-      const paceRaw = document.getElementById('runPaceInput').value.trim();
-      let paceMinPerKm = null;
-      if (paceRaw.includes(":")) {
-        const [min, sec] = paceRaw.split(":").map(Number);
-        if (!isNaN(min) && !isNaN(sec)) {
-          paceMinPerKm = min + sec / 60;
-        }
-      }
+  return parts.join(" ");
+}
 
-      let filled = {
-        distance: isFinite(d) && d > 0,
-        time: isFinite(timeMin) && timeMin > 0,
-        pace: isFinite(paceMinPerKm) && paceMinPerKm > 0
-      };
+function calcRun() {
+  const d = parseFloat(document.getElementById('runDistance').value);
+  const timeMin = toMinutes(
+    document.getElementById('runTimeH').value,
+    document.getElementById('runTimeM').value,
+    document.getElementById('runTimeS').value
+  );
 
-      let out = "";
+  const pm = parseInt(document.getElementById('runPaceM').value) || 0;
+  const ps = parseInt(document.getElementById('runPaceS').value) || 0;
+  let paceMinPerKm = (pm > 0 || ps > 0) ? pm + ps / 60 : null;
 
-      if (filled.distance && filled.time && !filled.pace) {
-        const rawPace = timeMin / d;
-        out = `Темп: ${formatPace(rawPace)}`;
-      }
-      else if (filled.distance && filled.pace && !filled.time) {
-        const total = d * paceMinPerKm;
-        out = `Время: ${formatHMS(total)}`;
-      }
-      else if (filled.time && filled.pace && !filled.distance) {
-        const dist = timeMin / paceMinPerKm;
-        out = `Дистанция: ${dist.toFixed(2)} км`;
-      }
-      else {
-        out = "Заполни два блока из трёх (дистанция/темп/время), чтобы посчитать третий.";
-      }
+  let filled = {
+    distance: isFinite(d) && d > 0,
+    time: isFinite(timeMin) && timeMin > 0,
+    pace: isFinite(paceMinPerKm) && paceMinPerKm > 0
+  };
 
-      document.getElementById('runResult').textContent = out;
-    }
+  let out = "";
+
+  if (filled.distance && filled.time && !filled.pace) {
+    const rawPace = timeMin / d;
+    out = `Темп: ${formatPace(rawPace)}`;
+  }
+  else if (filled.distance && filled.pace && !filled.time) {
+    const total = d * paceMinPerKm;
+    out = `Время: ${formatHMS(total)}`;
+  }
+  else if (filled.time && filled.pace && !filled.distance) {
+    const dist = timeMin / paceMinPerKm;
+    out = `Дистанция: ${dist.toFixed(2)} км`;
+  }
+  else {
+    out = "Заполни два блока из трёх (дистанция/темп/время), чтобы посчитать третий.";
+  }
+
+  document.getElementById('runResult').textContent = out;
+}
+
 
     function clearRun() {
       ['runDistance','runPaceInput','runTimeH','runTimeM','runTimeS'].forEach(id => {
