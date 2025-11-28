@@ -29,6 +29,10 @@
       width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #2a2f37;
       background: #12161b; color: var(--text); outline: none;
     }
+    .activeBtn {
+  background: #22c55e;
+  color: white;
+}
     input:focus { border-color: var(--accent); }
     .btn {
       display: inline-block; padding: 10px 14px; border-radius: 10px; border: 0;
@@ -93,7 +97,15 @@
           <button class="btn secondary" type="button" onclick="clearRun()">Сбросить</button>
         </div>
 
+        <button id="intervalBtn" class="btn secondary" onclick="toggleIntervals()">Интервалы</button>
+        
         <div id="runResult" class="result"></div>
+        
+        <div id="intervalsBlock" style="display:none; margin-top:16px;">
+  <h3>Интервальные тренировки</h3>
+  <button class="btn" type="button" onclick="addInterval()">Добавить интервал</button>
+  <div id="intervalList"></div>
+</div>
       </div>
     </section>
     <!-- Велосипед -->
@@ -130,6 +142,40 @@
       return h * 60 + m + s / 60;
     }
 
+let intervalMode = false;
+let intervalCount = 0;
+
+function toggleIntervals() {
+  intervalMode = !intervalMode;
+  const btn = document.getElementById('intervalBtn');
+  if (intervalMode) {
+    btn.classList.remove('secondary');
+    btn.classList.add('activeBtn');
+    btn.textContent = "Интервалы (вкл)";
+    document.getElementById('intervalsBlock').style.display = "block";
+  } else {
+    btn.classList.remove('activeBtn');
+    btn.classList.add('secondary');
+    btn.textContent = "Интервалы";
+    document.getElementById('intervalsBlock').style.display = "none";
+  }
+}
+
+function addInterval() {
+  intervalCount++;
+  const container = document.getElementById('intervalList');
+  const block = document.createElement('div');
+  block.className = "card";
+  block.style.marginTop = "10px";
+  block.innerHTML = `
+    <h4>Интервал ${intervalCount}</h4>
+    <label>Дистанция (км): <input type="number" step="0.1" min="0"></label><br>
+    <label>Темп (мин/км): <input type="text" placeholder="5:00"></label><br>
+    <label>Пауза (сек): <input type="number" min="0"></label>
+  `;
+  container.appendChild(block);
+}
+    
 function formatPace(minutesPerKm) {
   if (!isFinite(minutesPerKm)) return "";
   let paceMin = Math.floor(minutesPerKm);
