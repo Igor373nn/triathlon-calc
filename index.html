@@ -101,13 +101,14 @@
         
         <div id="runResult" class="result"></div>
         
-        <<div id="intervalsBlock" style="display:none; margin-top:16px;">
+<div id="intervalsBlock" style="display:none; margin-top:16px;">
   <h3>Интервальные тренировки</h3>
   <button class="btn" type="button" onclick="addInterval()">Добавить интервал</button>
   <div id="intervalList"></div>
   <button class="btn" type="button" onclick="calcIntervals()">Рассчитать интервалы</button>
   <div id="intervalResult" class="result"></div>
 </div>
+
 
       </div>
     </section>
@@ -152,18 +153,20 @@ function toggleIntervals() {
   intervalMode = !intervalMode;
   const baseCalc = document.getElementById('run');
   const intervals = document.getElementById('intervalsBlock');
+  const list = document.getElementById('intervalList');
   if (intervalMode) {
     baseCalc.style.display = "none";
     intervals.style.display = "block";
-    intervalList.innerHTML = "";
+    list.innerHTML = "";
     intervalCount = 0;
-    addInterval(); // сразу 2 блока
+    addInterval();
     addInterval();
   } else {
     baseCalc.style.display = "block";
     intervals.style.display = "none";
   }
 }
+
 
 function addInterval() {
   intervalCount++;
@@ -267,12 +270,13 @@ function calcRun() {
 }
 
 
-    function clearRun() {
-      ['runDistance','runPaceInput','runTimeH','runTimeM','runTimeS'].forEach(id => {
-        document.getElementById(id).value = '';
-      });
-      document.getElementById('runResult').textContent = '';
-    }
+function clearRun() {
+  ['runDistance','runPaceM','runPaceS','runTimeH','runTimeM','runTimeS'].forEach(id => {
+    document.getElementById(id).value = '';
+  });
+  document.getElementById('runResult').textContent = '';
+}
+
   </script>
 </body>
 </html>
