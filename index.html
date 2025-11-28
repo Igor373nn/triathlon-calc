@@ -101,11 +101,14 @@
         
         <div id="runResult" class="result"></div>
         
-        <div id="intervalsBlock" style="display:none; margin-top:16px;">
+        <<div id="intervalsBlock" style="display:none; margin-top:16px;">
   <h3>Интервальные тренировки</h3>
   <button class="btn" type="button" onclick="addInterval()">Добавить интервал</button>
   <div id="intervalList"></div>
+  <button class="btn" type="button" onclick="calcIntervals()">Рассчитать интервалы</button>
+  <div id="intervalResult" class="result"></div>
 </div>
+
       </div>
     </section>
     <!-- Велосипед -->
@@ -147,17 +150,18 @@ let intervalCount = 0;
 
 function toggleIntervals() {
   intervalMode = !intervalMode;
-  const btn = document.getElementById('intervalBtn');
+  const baseCalc = document.getElementById('run');
+  const intervals = document.getElementById('intervalsBlock');
   if (intervalMode) {
-    btn.classList.remove('secondary');
-    btn.classList.add('activeBtn');
-    btn.textContent = "Интервалы (вкл)";
-    document.getElementById('intervalsBlock').style.display = "block";
+    baseCalc.style.display = "none";
+    intervals.style.display = "block";
+    intervalList.innerHTML = "";
+    intervalCount = 0;
+    addInterval(); // сразу 2 блока
+    addInterval();
   } else {
-    btn.classList.remove('activeBtn');
-    btn.classList.add('secondary');
-    btn.textContent = "Интервалы";
-    document.getElementById('intervalsBlock').style.display = "none";
+    baseCalc.style.display = "block";
+    intervals.style.display = "none";
   }
 }
 
@@ -169,11 +173,35 @@ function addInterval() {
   block.style.marginTop = "10px";
   block.innerHTML = `
     <h4>Интервал ${intervalCount}</h4>
-    <label>Дистанция (км): <input type="number" step="0.1" min="0"></label><br>
-    <label>Темп (мин/км): <input type="text" placeholder="5:00"></label><br>
-    <label>Пауза (сек): <input type="number" min="0"></label>
+    <label>Дистанция (км): <input type="number" step="0.1" min="0" class="intDistance"></label><br>
+    <label>Темп (мин/км): <input type="text" class="intPace" placeholder="5:00"></label><br>
+    <label>Время (мин): <input type="number" min="0" class="intTime"></label><br>
+    <label>Комментарий: <input type="text" class="intComment" placeholder="Пульс/заметка"></label><br>
+    <button class="btn secondary" type="button" onclick="this.parentElement.remove()">Удалить</button>
   `;
   container.appendChild(block);
+}
+
+function calcIntervals() {
+  const distances = document.querySelectorAll('.intDistance');
+  const paces = document.querySelectorAll('.intPace');
+  const times = document.querySelectorAll('.intTime');
+  const comments = document.querySelectorAll('.intComment');
+
+  let table = "<table border='1' style='width:100%;border-collapse:collapse;text-align:center;'><tr><th>Интервал</th><th>Дистанция (км)</th><th>Темп</th><th>Время (мин)</th><th>Комментарий</th></tr>";
+
+  for (let i = 0; i < distances.length; i++) {
+    table += `<tr>
+      <td>${i+1}</td>
+      <td>${distances[i].value}</td>
+      <td>${paces[i].value}</td>
+      <td>${times[i].value}</td>
+      <td>${comments[i].value}</td>
+    </tr>`;
+  }
+
+  table += "</table>";
+  document.getElementById('intervalResult').innerHTML = table;
 }
     
 function formatPace(minutesPerKm) {
