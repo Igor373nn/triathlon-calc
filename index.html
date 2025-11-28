@@ -3,9 +3,42 @@
 <head>
   <meta charset="UTF-8">
   <title>Triathlon Calc</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 0; padding: 0; }
+    nav { background: #333; padding: 10px; }
+    nav a { color: white; margin: 0 10px; text-decoration: none; }
+    nav a:hover { text-decoration: underline; }
+    .tab { display: none; padding: 20px; }
+    .active { display: block; }
+  </style>
 </head>
 <body>
-  <h1>Привет! Это мой сайт для триатлона</h1>
-  <p>Скоро здесь будут калькуляторы для бега, велосипеда и плавания.</p>
+  <nav>
+    <a href="#" onclick="showTab('run')">🏃 Бег</a>
+    <a href="#" onclick="showTab('bike')">🚴 Велосипед</a>
+    <a href="#" onclick="showTab('swim')">🏊 Плавание</a>
+  </nav>
+
+  <div id="run" class="tab active">
+    <h2>Калькулятор для бега</h2>
+    <p>Здесь будет калькулятор темпа и интервалов.</p>
+  </div>
+
+  <div id="bike" class="tab">
+    <h2>Калькулятор для велосипеда</h2>
+    <p>Здесь будет калькулятор скорости и дистанции.</p>
+  </div>
+
+  <div id="swim" class="tab">
+    <h2>Калькулятор для плавания</h2>
+    <p>Здесь будет калькулятор темпа и бассейна.</p>
+  </div>
+
+  <script>
+    function showTab(tabId) {
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      document.getElementById(tabId).classList.add('active');
+    }
+  </script>
 </body>
 </html>
