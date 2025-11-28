@@ -110,6 +110,7 @@
         <div id="intervalList"></div>
         <button class="btn" type="button" onclick="calcIntervals()">Рассчитать интервалы</button>
         <div id="intervalResult" class="result"></div>
+        <button class="btn secondary" type="button" onclick="exitIntervals()">Назад к бегу</button>
       </div>
     </section>
 
@@ -152,20 +153,28 @@ let intervalCount = 0;
 
 function toggleIntervals() {
   intervalMode = !intervalMode;
-  const baseCalc = document.getElementById('run');
+  const baseCalcCard = document.querySelector('#run .card'); // скрываем только карточку
   const intervals = document.getElementById('intervalsBlock');
   const list = document.getElementById('intervalList');
   if (intervalMode) {
-    baseCalc.style.display = "none";
+    baseCalcCard.style.display = "none";
     intervals.style.display = "block";
     list.innerHTML = "";
     intervalCount = 0;
     addInterval();
     addInterval();
   } else {
-    baseCalc.style.display = "block";
+    baseCalcCard.style.display = "block";
     intervals.style.display = "none";
   }
+}
+
+function exitIntervals() {
+  intervalMode = false;
+  const baseCalcCard = document.querySelector('#run .card');
+  const intervals = document.getElementById('intervalsBlock');
+  baseCalcCard.style.display = "block";
+  intervals.style.display = "none";
 }
 
 
@@ -181,11 +190,23 @@ function addInterval() {
     <label>Темп (мин/км): <input type="text" class="intPace" placeholder="5:00"></label><br>
     <label>Время (мин): <input type="number" min="0" class="intTime"></label><br>
     <label>Комментарий: <input type="text" class="intComment" placeholder="Пульс/заметка"></label><br>
-    <button class="btn secondary" type="button" onclick="this.parentElement.remove()">Удалить</button>
+   <button class="btn secondary" type="button" onclick="removeInterval(this)">Удалить</button>
   `;
   container.appendChild(block);
 }
+    
+function removeInterval(btn) {
+  btn.parentElement.remove();
+  renumberIntervals();
+}
 
+function renumberIntervals() {
+  const blocks = document.querySelectorAll('#intervalList .card h4');
+  blocks.forEach((h4, i) => {
+    h4.textContent = `Интервал ${i+1}`;
+  });
+}
+    
 function calcIntervals() {
   const distances = document.querySelectorAll('.intDistance');
   const paces = document.querySelectorAll('.intPace');
