@@ -110,6 +110,7 @@
         <div id="intervalList"></div>
         <button class="btn" type="button" onclick="calcIntervals()">Рассчитать интервалы</button>
         <div id="intervalResult" class="result"></div>
+        <button class="btn secondary" type="button" onclick="clearIntervals()">Очистить</button>
         <button class="btn secondary" type="button" onclick="exitIntervals()">Назад к бегу</button>
       </div>
     </section>
@@ -185,15 +186,17 @@ function addInterval() {
   block.className = "card";
   block.style.marginTop = "10px";
   block.innerHTML = `
-    <h4>Интервал ${intervalCount}</h4>
+    <h4>Интервал</h4>
     <label>Дистанция (км): <input type="number" step="0.1" min="0" class="intDistance"></label><br>
     <label>Темп (мин/км): <input type="text" class="intPace" placeholder="5:00"></label><br>
     <label>Время (мин): <input type="number" min="0" class="intTime"></label><br>
     <label>Комментарий: <input type="text" class="intComment" placeholder="Пульс/заметка"></label><br>
-   <button class="btn secondary" type="button" onclick="removeInterval(this)">Удалить</button>
+    <button class="btn secondary" type="button" onclick="removeInterval(this)">Удалить</button>
   `;
   container.appendChild(block);
+  renumberIntervals(); // 🔑 пересчёт сразу после добавления
 }
+
     
 function removeInterval(btn) {
   btn.parentElement.remove();
@@ -213,20 +216,68 @@ function calcIntervals() {
   const times = document.querySelectorAll('.intTime');
   const comments = document.querySelectorAll('.intComment');
 
-  let table = "<table border='1' style='width:100%;border-collapse:collapse;text-align:center;'><tr><th>Интервал</th><th>Дистанция (км)</th><th>Темп</th><th>Время (мин)</th><th>Комментарий</th></tr>";
+  let table = "<table border='1' style='width:100%;border-collapse:collapse;text-align:center;'><tr><th>Интервал</th><th>Дистанция (км)</th><th>Темп</th><th>Время</th><th>Комментарий</th></tr>";
 
   for (let i = 0; i < distances.length; i++) {
+    // читаем значения
+    const dist = parseFloat(distances[i].value) || null;
+    const paceRaw = paces[i].value.trim();
+    const time = parseFloat(times[i].value) || null;
+    const comment = comments[i].value;
+
+    // преобразуем темп в минуты/км
+    let paceMinPerKm = null;
+    let paceOut = "";
+    if (paceRaw) {
+      if (paceRaw.includes(":")) {
+        const [pm, ps] = paceRaw.split(":").map(Number);
+        paceMinPerKm = pm + (ps/60);
+        paceOut = `${pm}:${ps.toString().padStart(2,"0")}`;
+      } else {
+        const pm = parseInt(paceRaw);
+        paceMinPerKm = pm;
+        paceOut = `${pm}:00`;
+      }
+    }
+
+    let distOut = dist;
+    let timeOut = time;
+
+    // вычисляем недостающий параметр
+    if (dist && time && !paceMinPerKm) {
+      const rawPace = time / dist;
+      paceOut = formatPace(rawPace);
+    }
+    else if (dist && paceMinPerKm && !time) {
+      const total = dist * paceMinPerKm;
+      timeOut = total.toFixed(1);
+    }
+    else if (time && paceMinPerKm && !dist) {
+      const distCalc = time / paceMinPerKm;
+      distOut = distCalc.toFixed(2);
+    }
+
+    // если вообще нет данных — пропускаем строку
+    if (!(distOut || paceOut || timeOut)) continue;
+
     table += `<tr>
       <td>${i+1}</td>
-      <td>${distances[i].value}</td>
-      <td>${paces[i].value}</td>
-      <td>${times[i].value}</td>
-      <td>${comments[i].value}</td>
+      <td>${distOut ?? ""}</td>
+      <td>${paceOut ?? ""}</td>
+      <td>${timeOut ?? ""}</td>
+      <td>${comment}</td>
     </tr>`;
   }
 
   table += "</table>";
   document.getElementById('intervalResult').innerHTML = table;
+}
+
+
+function clearIntervals() {
+  document.getElementById('intervalList').innerHTML = "";
+  document.getElementById('intervalResult').innerHTML = "";
+  intervalCount = 0;
 }
     
 function formatPace(minutesPerKm) {
