@@ -11,8 +11,6 @@
       --accent: #3a86ff;
       --text: #e9edf3;
       --muted: #9aa4b2;
-      --ok: #22c55e;
-      --warn: #f59e0b;
     }
     * { box-sizing: border-box; }
     body { margin: 0; font-family: Inter, Arial, sans-serif; background: var(--bg); color: var(--text); }
@@ -27,11 +25,11 @@
     fieldset { border: 1px solid #2a2f37; border-radius: 10px; padding: 12px; margin: 0 0 12px; }
     legend { padding: 0 6px; color: var(--muted); font-size: 12px; }
     label { display: grid; grid-template-columns: 140px 1fr; align-items: center; gap: 12px; margin: 8px 0; }
-    input[type="number"] {
+    input[type="number"], input[type="text"] {
       width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #2a2f37;
       background: #12161b; color: var(--text); outline: none;
     }
-    input[type="number"]:focus { border-color: var(--accent); }
+    input:focus { border-color: var(--accent); }
     .btn {
       display: inline-block; padding: 10px 14px; border-radius: 10px; border: 0;
       background: var(--accent); color: white; font-weight: 600; cursor: pointer;
@@ -64,40 +62,25 @@
             <legend>Дистанция</legend>
             <label>
               <span>Километры</span>
-              <input type="number" id="runDistance" step="0.01" min="0" placeholder="напр. 10">
+              <input type="number" id="runDistance" step="0.01" min="0">
             </label>
-            <p class="muted">Введи дистанцию в километрах.</p>
           </fieldset>
 
           <fieldset>
             <legend>Темп (мин/км)</legend>
             <label>
-              <span>Минуты на км</span>
-              <input type="number" id="runPaceM" min="0" placeholder="напр. 5">
+              <span>Формат -:--</span>
+              <input type="text" id="runPaceInput" placeholder="6:30">
             </label>
-            <label>
-              <span>Секунды на км</span>
-              <input type="number" id="runPaceS" min="0" max="59" placeholder="напр. 30">
-            </label>
-            <p class="muted">Формат вывода будет вида 5:30 мин/км.</p>
+            <p class="muted">Темп на км, например 5:45</p>
           </fieldset>
         </div>
 
         <fieldset>
           <legend>Общее время</legend>
-          <label>
-            <span>Часы</span>
-            <input type="number" id="runTimeH" min="0" placeholder="напр. 0">
-          </label>
-          <label>
-            <span>Минуты</span>
-            <input type="number" id="runTimeM" min="0" max="59" placeholder="напр. 45">
-          </label>
-          <label>
-            <span>Секунды</span>
-            <input type="number" id="runTimeS" min="0" max="59" placeholder="напр. 00">
-          </label>
-          <p class="muted">Заполни любые два блока (дистанция/темп/время), третий посчитается.</p>
+          <label><span>Часы</span><input type="number" id="runTimeH" min="0"></label>
+          <label><span>Минуты</span><input type="number" id="runTimeM" min="0" max="59"></label>
+          <label><span>Секунды</span><input type="number" id="runTimeS" min="0" max="59"></label>
         </fieldset>
 
         <div style="display:flex; gap:8px; margin-top:8px;">
@@ -108,7 +91,6 @@
         <div id="runResult" class="result"></div>
       </div>
     </section>
-
     <!-- Велосипед -->
     <section id="bike" class="tab">
       <div class="card">
@@ -135,7 +117,7 @@
       document.getElementById('tab-' + tabId).classList.add('active');
     }
 
-    // Утилиты форматирования
+    // Вспомогательные функции
     function toMinutes(h, m, s) {
       h = Number(h) || 0;
       m = Number(m) || 0;
@@ -168,8 +150,15 @@
         document.getElementById('runTimeM').value,
         document.getElementById('runTimeS').value
       );
-      const paceMinPerKm = (Number(document.getElementById('runPaceM').value) || 0) +
-                           (Number(document.getElementById('runPaceS').value) || 0) / 60;
+
+      const paceRaw = document.getElementById('runPaceInput').value.trim();
+      let paceMinPerKm = null;
+      if (paceRaw.includes(":")) {
+        const [min, sec] = paceRaw.split(":").map(Number);
+        if (!isNaN(min) && !isNaN(sec)) {
+          paceMinPerKm = min + sec / 60;
+        }
+      }
 
       let filled = {
         distance: isFinite(d) && d > 0,
@@ -179,17 +168,14 @@
 
       let out = "";
 
-      // Случай 1: d + time -> pace
       if (filled.distance && filled.time && !filled.pace) {
         const rawPace = timeMin / d;
         out = `Темп: ${formatPace(rawPace)}`;
       }
-      // Случай 2: d + pace -> time
       else if (filled.distance && filled.pace && !filled.time) {
         const total = d * paceMinPerKm;
         out = `Время: ${formatHMS(total)}`;
       }
-      // Случай 3: time + pace -> distance
       else if (filled.time && filled.pace && !filled.distance) {
         const dist = timeMin / paceMinPerKm;
         out = `Дистанция: ${dist.toFixed(2)} км`;
@@ -202,7 +188,7 @@
     }
 
     function clearRun() {
-      ['runDistance','runPaceM','runPaceS','runTimeH','runTimeM','runTimeS'].forEach(id => {
+      ['runDistance','runPaceInput','runTimeH','runTimeM','runTimeS'].forEach(id => {
         document.getElementById(id).value = '';
       });
       document.getElementById('runResult').textContent = '';
