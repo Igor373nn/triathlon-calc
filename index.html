@@ -99,19 +99,20 @@
 
         <button id="intervalBtn" class="btn secondary" onclick="toggleIntervals()">Интервалы</button>
         
-        <div id="runResult" class="result"></div>
-        
-<div id="intervalsBlock" style="display:none; margin-top:16px;">
-  <h3>Интервальные тренировки</h3>
-  <button class="btn" type="button" onclick="addInterval()">Добавить интервал</button>
-  <div id="intervalList"></div>
-  <button class="btn" type="button" onclick="calcIntervals()">Рассчитать интервалы</button>
-  <div id="intervalResult" class="result"></div>
-</div>
-
-
+               <div id="runResult" class="result"></div>
       </div>
     </section>
+
+    <section id="intervalsBlock" class="tab" style="display:none; margin-top:16px;">
+      <div class="card">
+        <h3>Интервальные тренировки</h3>
+        <button class="btn" type="button" onclick="addInterval()">Добавить интервал</button>
+        <div id="intervalList"></div>
+        <button class="btn" type="button" onclick="calcIntervals()">Рассчитать интервалы</button>
+        <div id="intervalResult" class="result"></div>
+      </div>
+    </section>
+
     <!-- Велосипед -->
     <section id="bike" class="tab">
       <div class="card">
