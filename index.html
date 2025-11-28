@@ -29,15 +29,10 @@
       width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #2a2f37;
       background: #12161b; color: var(--text); outline: none;
     }
-    .activeBtn {
-  background: #22c55e;
-  color: white;
-}
+    .activeBtn { background: #22c55e; color: white; }
     input:focus { border-color: var(--accent); }
-    .btn {
-      display: inline-block; padding: 10px 14px; border-radius: 10px; border: 0;
-      background: var(--accent); color: white; font-weight: 600; cursor: pointer;
-    }
+    .btn { display: inline-block; padding: 10px 14px; border-radius: 10px; border: 0;
+      background: var(--accent); color: white; font-weight: 600; cursor: pointer; }
     .btn.secondary { background: #2c3340; color: var(--text); }
     .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
     .result { margin-top: 12px; padding: 12px; border-radius: 10px; background: #12161b; border: 1px solid #2a2f37; }
@@ -70,19 +65,18 @@
             </label>
           </fieldset>
 
-<fieldset>
-  <legend>Темп (мин/км)</legend>
-  <label>
-    <span>Формат -:--</span>
-    <div style="display:flex;align-items:center;gap:4px;">
-      <input type="number" id="runPaceM" min="0" style="width:60px;" placeholder="6">
-      <span>:</span>
-      <input type="number" id="runPaceS" min="0" max="59" style="width:60px;" placeholder="30">
-    </div>
-  </label>
-  <p class="muted">Темп на км, например 5:45</p>
-</fieldset>
-
+          <fieldset>
+            <legend>Темп (мин/км)</legend>
+            <label>
+              <span>Формат -:--</span>
+              <div style="display:flex;align-items:center;gap:4px;">
+                <input type="number" id="runPaceM" min="0" style="width:60px;" placeholder="6">
+                <span>:</span>
+                <input type="number" id="runPaceS" min="0" max="59" style="width:60px;" placeholder="30">
+              </div>
+            </label>
+            <p class="muted">Темп на км, например 5:45</p>
+          </fieldset>
         </div>
 
         <fieldset>
@@ -100,18 +94,20 @@
         <button id="intervalBtn" class="btn secondary" onclick="toggleIntervals()">Интервалы</button>
         
         <div id="runResult" class="result"></div>
-        
-<div id="intervalsBlock" style="display:none; margin-top:16px;">
-  <h3>Интервальные тренировки</h3>
-  <button class="btn" type="button" onclick="addInterval()">Добавить интервал</button>
-  <div id="intervalList"></div>
-  <button class="btn" type="button" onclick="calcIntervals()">Рассчитать интервалы</button>
-  <div id="intervalResult" class="result"></div>
-</div>
-
-
       </div>
     </section>
+
+    <!-- Интервалы -->
+    <section id="intervalsBlock" class="tab" style="display:none;">
+      <div class="card">
+        <h3>Интервальные тренировки</h3>
+        <button class="btn" type="button" onclick="addInterval()">Добавить интервал</button>
+        <div id="intervalList"></div>
+        <button class="btn" type="button" onclick="calcIntervals()">Рассчитать интервалы</button>
+        <div id="intervalResult" class="result"></div>
+      </div>
+    </section>
+
     <!-- Велосипед -->
     <section id="bike" class="tab">
       <div class="card">
@@ -130,7 +126,6 @@
   </main>
 
   <script>
-    // Переключение вкладок
     function showTab(tabId) {
       document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
       document.getElementById(tabId).classList.add('active');
@@ -138,7 +133,6 @@
       document.getElementById('tab-' + tabId).classList.add('active');
     }
 
-    // Вспомогательные функции
     function toMinutes(h, m, s) {
       h = Number(h) || 0;
       m = Number(m) || 0;
@@ -146,27 +140,26 @@
       return h * 60 + m + s / 60;
     }
 
-let intervalMode = false;
-let intervalCount = 0;
+    let intervalMode = false;
+    let intervalCount = 0;
 
-function toggleIntervals() {
-  intervalMode = !intervalMode;
-  const baseCalc = document.getElementById('run');
-  const intervals = document.getElementById('intervalsBlock');
-  const list = document.getElementById('intervalList');
-  if (intervalMode) {
-    baseCalc.style.display = "none";
-    intervals.style.display = "block";
-    list.innerHTML = "";
-    intervalCount = 0;
-    addInterval();
-    addInterval();
-  } else {
-    baseCalc.style.display = "block";
-    intervals.style.display = "none";
-  }
-}
-
+    function toggleIntervals() {
+      intervalMode = !intervalMode;
+      const baseCalc = document.getElementById('run');
+      const intervals = document.getElementById('intervalsBlock');
+      const list = document.getElementById('intervalList');
+      if (intervalMode) {
+        baseCalc.style.display = "none";
+        intervals.style.display = "block";
+        list.innerHTML = "";
+        intervalCount = 0;
+        addInterval();
+        addInterval();
+      } else {
+        baseCalc.style.display = "block";
+        intervals.style.display = "none";
+      }
+    }
 
 function addInterval() {
   intervalCount++;
@@ -191,92 +184,42 @@ function calcIntervals() {
   const times = document.querySelectorAll('.intTime');
   const comments = document.querySelectorAll('.intComment');
 
+  let totalDist = 0;
+  let totalTime = 0;
+
   let table = "<table border='1' style='width:100%;border-collapse:collapse;text-align:center;'><tr><th>Интервал</th><th>Дистанция (км)</th><th>Темп</th><th>Время (мин)</th><th>Комментарий</th></tr>";
 
   for (let i = 0; i < distances.length; i++) {
+    const dist = parseFloat(distances[i].value) || 0;
+    const pace = paces[i].value;
+    const time = parseFloat(times[i].value) || 0;
+    const comment = comments[i].value;
+
+    totalDist += dist;
+    totalTime += time;
+
     table += `<tr>
       <td>${i+1}</td>
-      <td>${distances[i].value}</td>
-      <td>${paces[i].value}</td>
-      <td>${times[i].value}</td>
-      <td>${comments[i].value}</td>
+      <td>${dist}</td>
+      <td>${pace}</td>
+      <td>${time}</td>
+      <td>${comment}</td>
     </tr>`;
   }
+
+  table += `<tr style="font-weight:bold;">
+    <td>Итого</td>
+    <td>${totalDist.toFixed(2)}</td>
+    <td>-</td>
+    <td>${totalTime.toFixed(1)}</td>
+    <td></td>
+  </tr>`;
 
   table += "</table>";
   document.getElementById('intervalResult').innerHTML = table;
 }
-    
-function formatPace(minutesPerKm) {
-  if (!isFinite(minutesPerKm)) return "";
-  let paceMin = Math.floor(minutesPerKm);
-  let paceSec = Math.round((minutesPerKm - paceMin) * 60);
-  if (paceSec === 60) { paceMin += 1; paceSec = 0; }
-  return `${paceMin}:${paceSec.toString().padStart(2, '0')} мин/км`;
-}
+          container.appendChild(block);
+    }
 
-function formatHMS(totalMinutes) {
-  if (!isFinite(totalMinutes)) return "";
-  const totalSeconds = Math.round(totalMinutes * 60);
-  const h = Math.floor(totalSeconds / 3600);
-  const m = Math.floor((totalSeconds % 3600) / 60);
-  const s = totalSeconds % 60;
+  
 
-  let parts = [];
-  if (h > 0) parts.push(`${h} ч`);
-  if (m > 0) parts.push(`${m} мин`);
-  parts.push(`${s} сек`);
-
-  return parts.join(" ");
-}
-
-function calcRun() {
-  const d = parseFloat(document.getElementById('runDistance').value);
-  const timeMin = toMinutes(
-    document.getElementById('runTimeH').value,
-    document.getElementById('runTimeM').value,
-    document.getElementById('runTimeS').value
-  );
-
-  const pm = parseInt(document.getElementById('runPaceM').value) || 0;
-  const ps = parseInt(document.getElementById('runPaceS').value) || 0;
-  let paceMinPerKm = (pm > 0 || ps > 0) ? pm + ps / 60 : null;
-
-  let filled = {
-    distance: isFinite(d) && d > 0,
-    time: isFinite(timeMin) && timeMin > 0,
-    pace: isFinite(paceMinPerKm) && paceMinPerKm > 0
-  };
-
-  let out = "";
-
-  if (filled.distance && filled.time && !filled.pace) {
-    const rawPace = timeMin / d;
-    out = `Темп: ${formatPace(rawPace)}`;
-  }
-  else if (filled.distance && filled.pace && !filled.time) {
-    const total = d * paceMinPerKm;
-    out = `Время: ${formatHMS(total)}`;
-  }
-  else if (filled.time && filled.pace && !filled.distance) {
-    const dist = timeMin / paceMinPerKm;
-    out = `Дистанция: ${dist.toFixed(2)} км`;
-  }
-  else {
-    out = "Заполни два блока из трёх (дистанция/темп/время), чтобы посчитать третий.";
-  }
-
-  document.getElementById('runResult').textContent = out;
-}
-
-
-function clearRun() {
-  ['runDistance','runPaceM','runPaceS','runTimeH','runTimeM','runTimeS'].forEach(id => {
-    document.getElementById(id).value = '';
-  });
-  document.getElementById('runResult').textContent = '';
-}
-
-  </script>
-</body>
-</html>
