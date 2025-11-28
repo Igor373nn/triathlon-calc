@@ -22,9 +22,25 @@
   <div id="run" class="tab active">
 <h2>Калькулятор для бега</h2>
 <form id="runCalc">
-  <label>Дистанция (км): <input type="number" id="runDistance" step="0.1"></label><br><br>
-  <label>Время (мин): <input type="number" id="runTime" step="0.1"></label><br><br>
-  <label>Темп (мин/км): <input type="number" id="runPace" step="0.01"></label><br><br>
+  <fieldset>
+    <legend>Дистанция</legend>
+    <label>Километры: <input type="number" id="runDistance" step="0.1"></label>
+  </fieldset>
+
+  <fieldset>
+    <legend>Время</legend>
+    <label>Часы: <input type="number" id="runTimeH" min="0"></label>
+    <label>Минуты: <input type="number" id="runTimeM" min="0" max="59"></label>
+    <label>Секунды: <input type="number" id="runTimeS" min="0" max="59"></label>
+  </fieldset>
+
+  <fieldset>
+    <legend>Темп (на км)</legend>
+    <label>Минуты: <input type="number" id="runPaceM" min="0"></label>
+    <label>Секунды: <input type="number" id="runPaceS" min="0" max="59"></label>
+  </fieldset>
+
+  <br>
   <button type="button" onclick="calcRun()">Рассчитать</button>
 </form>
 
@@ -33,23 +49,37 @@
 <script>
 function calcRun() {
   let d = parseFloat(document.getElementById('runDistance').value);
-  let t = parseFloat(document.getElementById('runTime').value);
-  let p = parseFloat(document.getElementById('runPace').value);
+
+  let h = parseInt(document.getElementById('runTimeH').value) || 0;
+  let m = parseInt(document.getElementById('runTimeM').value) || 0;
+  let s = parseInt(document.getElementById('runTimeS').value) || 0;
+  let totalTime = h * 60 + m + s / 60;
+
+  let pm = parseInt(document.getElementById('runPaceM').value) || 0;
+  let ps = parseInt(document.getElementById('runPaceS').value) || 0;
+  let pace = pm + ps / 60;
+
   let result = "";
 
-  if (d && t && !p) {
-    result = "Темп: " + (t/d).toFixed(2) + " мин/км";
-  } else if (d && p && !t) {
-    result = "Время: " + (d*p).toFixed(2) + " мин";
-  } else if (t && p && !d) {
-    result = "Дистанция: " + (t/p).toFixed(2) + " км";
+  if (d && totalTime && !pace) {
+    result = "Темп: " + Math.floor(totalTime/d) + " мин " + Math.round((totalTime/d % 1) * 60) + " сек/км";
+  } else if (d && pace && !totalTime) {
+    let total = d * pace;
+    let rh = Math.floor(total / 60);
+    let rm = Math.floor(total % 60);
+    let rs = Math.round((total % 1) * 60);
+    result = "Время: " + rh + " ч " + rm + " мин " + rs + " сек";
+  } else if (totalTime && pace && !d) {
+    let dist = totalTime / pace;
+    result = "Дистанция: " + dist.toFixed(2) + " км";
   } else {
-    result = "Заполни два поля, чтобы вычислить третье!";
+    result = "Заполни два блока, чтобы вычислить третий!";
   }
 
   document.getElementById('runResult').innerText = result;
 }
 </script>
+
 
 
   <div id="bike" class="tab">
