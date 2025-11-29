@@ -236,19 +236,20 @@ function calcIntervals() {
 
   for (let i = 0; i < distances.length; i++) {
     // читаем значения
-    const dist = parseFloat(distances[i].value) || null;
-    const pm = parseInt(paceMinutes[i].value) || null;
-    const ps = parseInt(paceSeconds[i].value) || null
-    const time = parseFloat(times[i].value) || null;
-    const comment = comments[i].value;
+  const dist = parseFloat(distances[i].value) || 0;
+  const pm = parseInt(paceMinutes[i].value) || 0;
+  const ps = parseInt(paceSeconds[i].value) || 0;
+  const time = parseFloat(times[i].value) || 0;
+  const comment = comments[i].value;
 
     // преобразуем темп в минуты/км
   let paceMinPerKm = null;
   let paceOut = "";
-  if (pm !== null && ps !== null) {
+  if (pm > 0 || ps > 0) {
     paceMinPerKm = pm + (ps/60);
     paceOut = `${pm}:${ps.toString().padStart(2,"0")}`;
   }
+
 
     let distOut = dist;
     let timeOut = time;
