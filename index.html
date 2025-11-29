@@ -198,7 +198,15 @@ function addInterval() {
       <input type="number" min="0" max="59" class="intPaceS" style="width:60px;">
     </div>
     </label><br>
-    <label>Время (мин): <input type="number" min="0" class="intTime"></label><br>
+    <label>Время (ч:м:с): 
+  <div style="display:flex;align-items:center;gap:4px;">
+    <input type="number" min="0" class="intTimeH" style="width:60px;">
+    <span>:</span>
+    <input type="number" min="0" max="59" class="intTimeM" style="width:60px;">
+    <span>:</span>
+    <input type="number" min="0" max="59" class="intTimeS" style="width:60px;">
+  </div>
+</label><br>
     <label>Комментарий: <input type="text" class="intComment" placeholder="Пульс/заметка"></label><br>
     <button class="btn secondary" type="button" onclick="clearIntervalFields(this)">Очистить</button>
     <button class="btn secondary" type="button" onclick="removeInterval(this)">Удалить</button>
@@ -243,9 +251,10 @@ function calcIntervals() {
   const dist = parseFloat(distances[i].value) || 0;
   const pm = parseInt(paceMinutes[i].value) || 0;
   const ps = parseInt(paceSeconds[i].value) || 0;
-  const h = parseInt(document.getElementById("runTimeH").value) || 0;
-  const m = parseInt(document.getElementById("runTimeM").value) || 0;
-  const s = parseInt(document.getElementById("runTimeS").value) || 0;
+  const h = parseInt(document.querySelectorAll('.intTimeH')[i].value) || 0;
+const m = parseInt(document.querySelectorAll('.intTimeM')[i].value) || 0;
+const s = parseInt(document.querySelectorAll('.intTimeS')[i].value) || 0;
+const totalMinutes = h * 60 + m + (s / 60);
   const comment = comments[i].value;
 
     // преобразуем темп в минуты/км
