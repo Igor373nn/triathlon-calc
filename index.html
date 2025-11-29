@@ -197,7 +197,7 @@ function addInterval() {
     <input type="number" min="0" max="59" class="intPaceS" style="width:60px;" oninput="lockFields(this)">
   </div>
 </label><br>
-<label>Время (ч:м:с): 
+<label>Время (часы:мин:сек): 
   <div style="display:flex;align-items:center;gap:4px;">
     <input type="number" min="0" class="intTimeH" style="width:60px;" oninput="lockFields(this)">
     <span>:</span>
@@ -291,7 +291,7 @@ function calcIntervals() {
   const times = document.querySelectorAll('.intTime');
   const comments = document.querySelectorAll('.intComment');
 
-  let table = "<table border='1' style='width:100%;border-collapse:collapse;text-align:center;'><tr><th>Интервал</th><th>Дистанция (км)</th><th>Темп</th><th>Время< (мин)/th><th>Комментарий</th></tr>";
+  let table = "<table border='1' style='width:100%;border-collapse:collapse;text-align:center;'><tr><th>Интервал</th><th>Дистанция (км)</th><th>Темп (мин/км)</th><th>Время (мин)<th>Комментарий</th></tr>";
 
   for (let i = 0; i < distances.length; i++) {
     // читаем значения
@@ -367,7 +367,7 @@ function formatPace(minutesPerKm) {
   let paceMin = Math.floor(minutesPerKm);
   let paceSec = Math.round((minutesPerKm - paceMin) * 60);
   if (paceSec === 60) { paceMin += 1; paceSec = 0; }
-  return `${paceMin}:${paceSec.toString().padStart(2, '0')} мин/км`;
+  return `${paceMin}:${paceSec.toString().padStart(2, '0')}`;
 }
 
 function formatHMS(totalMinutes) {
