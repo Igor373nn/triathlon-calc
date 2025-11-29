@@ -75,9 +75,11 @@
   <label>
     <span>Формат -:--</span>
     <div style="display:flex;align-items:center;gap:4px;">
+      <input type="number" id="runPaceM" min="0" style="width:60px;">
+      <span>:</span>
+      <input type="number" id="runPaceS" min="0" max="59" style="width:60px;">
     </div>
   </label>
-  <p class="muted">Темп на км, например 5:45</p>
 </fieldset>
 
         </div>
@@ -186,8 +188,11 @@ function addInterval() {
     <h4>Интервал</h4>
     <label>Дистанция (км): <input type="number" step="0.1" min="0" class="intDistance"></label><br>
     <label>Темп (мин/км): 
-      <div style="display:flex;align-items:center;gap:4px;">
-      </div>
+    <div style="display:flex;align-items:center;gap:4px;">
+      <input type="number" min="0" class="intPaceM" style="width:60px;">
+      <span>:</span>
+      <input type="number" min="0" max="59" class="intPaceS" style="width:60px;">
+    </div>
     </label><br>
     <label>Время (мин): <input type="number" min="0" class="intTime"></label><br>
     <label>Комментарий: <input type="text" class="intComment" placeholder="Пульс/заметка"></label><br>
