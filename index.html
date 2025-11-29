@@ -75,9 +75,6 @@
   <label>
     <span>Формат -:--</span>
     <div style="display:flex;align-items:center;gap:4px;">
-      <input type="number" id="runPaceM" min="0" style="width:60px;" placeholder="6">
-      <span>:</span>
-      <input type="number" id="runPaceS" min="0" max="59" style="width:60px;" placeholder="30">
     </div>
   </label>
   <p class="muted">Темп на км, например 5:45</p>
@@ -110,7 +107,7 @@
         <div id="intervalList"></div>
         <button class="btn" type="button" onclick="calcIntervals()">Рассчитать интервалы</button>
         <div id="intervalResult" class="result"></div>
-        <button class="btn secondary" type="button" onclick="clearIntervals()">Очистить</button>
+        <button class="btn secondary" type="button" onclick="clearAllIntervals()">Очистить всё</button>
         <button class="btn secondary" type="button" onclick="exitIntervals()">Назад к бегу</button>
       </div>
     </section>
@@ -190,13 +187,11 @@ function addInterval() {
     <label>Дистанция (км): <input type="number" step="0.1" min="0" class="intDistance"></label><br>
     <label>Темп (мин/км): 
       <div style="display:flex;align-items:center;gap:4px;">
-        <input type="number" min="0" class="intPaceM" style="width:60px;" placeholder="5">
-        <span>:</span>
-        <input type="number" min="0" max="59" class="intPaceS" style="width:60px;" placeholder="00">
       </div>
     </label><br>
     <label>Время (мин): <input type="number" min="0" class="intTime"></label><br>
     <label>Комментарий: <input type="text" class="intComment" placeholder="Пульс/заметка"></label><br>
+    <button class="btn secondary" type="button" onclick="clearIntervalFields(this)">Очистить</button>
     <button class="btn secondary" type="button" onclick="removeInterval(this)">Удалить</button>
   `;
   container.appendChild(block);
@@ -207,6 +202,15 @@ function addInterval() {
 function removeInterval(btn) {
   btn.parentElement.remove();
   renumberIntervals();
+}
+
+function clearIntervalFields(btn) {
+  const block = btn.parentElement;
+  block.querySelector('.intDistance').value = "";
+  block.querySelector('.intPaceM').value = "";
+  block.querySelector('.intPaceS').value = "";
+  block.querySelector('.intTime').value = "";
+  block.querySelector('.intComment').value = "";
 }
 
 function renumberIntervals() {
@@ -274,6 +278,15 @@ function calcIntervals() {
   document.getElementById('intervalResult').innerHTML = table;
 }
 
+
+function clearAllIntervals() {
+  document.querySelectorAll('.intDistance').forEach(el => el.value = "");
+  document.querySelectorAll('.intPaceM').forEach(el => el.value = "");
+  document.querySelectorAll('.intPaceS').forEach(el => el.value = "");
+  document.querySelectorAll('.intTime').forEach(el => el.value = "");
+  document.querySelectorAll('.intComment').forEach(el => el.value = "");
+  document.getElementById('intervalResult').innerHTML = "";
+}
 
 function clearIntervals() {
   document.getElementById('intervalList').innerHTML = "";
