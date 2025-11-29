@@ -188,7 +188,13 @@ function addInterval() {
   block.innerHTML = `
     <h4>Интервал</h4>
     <label>Дистанция (км): <input type="number" step="0.1" min="0" class="intDistance"></label><br>
-    <label>Темп (мин/км): <input type="text" class="intPace" placeholder="5:00"></label><br>
+    <label>Темп (мин/км): 
+      <div style="display:flex;align-items:center;gap:4px;">
+        <input type="number" min="0" class="intPaceM" style="width:60px;" placeholder="5">
+        <span>:</span>
+        <input type="number" min="0" max="59" class="intPaceS" style="width:60px;" placeholder="00">
+      </div>
+    </label><br>
     <label>Время (мин): <input type="number" min="0" class="intTime"></label><br>
     <label>Комментарий: <input type="text" class="intComment" placeholder="Пульс/заметка"></label><br>
     <button class="btn secondary" type="button" onclick="removeInterval(this)">Удалить</button>
@@ -212,7 +218,8 @@ function renumberIntervals() {
     
 function calcIntervals() {
   const distances = document.querySelectorAll('.intDistance');
-  const paces = document.querySelectorAll('.intPace');
+  const paceMinutes = document.querySelectorAll('.intPaceM');
+  const paceSeconds = document.querySelectorAll('.intPaceS');
   const times = document.querySelectorAll('.intTime');
   const comments = document.querySelectorAll('.intComment');
 
@@ -221,24 +228,18 @@ function calcIntervals() {
   for (let i = 0; i < distances.length; i++) {
     // читаем значения
     const dist = parseFloat(distances[i].value) || null;
-    const paceRaw = paces[i].value.trim();
+    const pm = parseInt(paceMinutes[i].value) || null;
+    const ps = parseInt(paceSeconds[i].value) || null
     const time = parseFloat(times[i].value) || null;
     const comment = comments[i].value;
 
     // преобразуем темп в минуты/км
-    let paceMinPerKm = null;
-    let paceOut = "";
-    if (paceRaw) {
-      if (paceRaw.includes(":")) {
-        const [pm, ps] = paceRaw.split(":").map(Number);
-        paceMinPerKm = pm + (ps/60);
-        paceOut = `${pm}:${ps.toString().padStart(2,"0")}`;
-      } else {
-        const pm = parseInt(paceRaw);
-        paceMinPerKm = pm;
-        paceOut = `${pm}:00`;
-      }
-    }
+  let paceMinPerKm = null;
+  let paceOut = "";
+  if (pm !== null && ps !== null) {
+    paceMinPerKm = pm + (ps/60);
+    paceOut = `${pm}:${ps.toString().padStart(2,"0")}`;
+  }
 
     let distOut = dist;
     let timeOut = time;
